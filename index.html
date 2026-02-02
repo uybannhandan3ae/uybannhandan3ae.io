@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 KHO ẢNH CHUNG - MẬT KHẨU: 3ccd</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background: #0f172a;
+            color: white;
+            min-height: 100vh;
+        }
+        
+        /* LOGIN SCREEN */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0f172a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .login-container {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 15px;
+            padding: 40px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .login-title {
+            font-size: 1.8rem;
+            color: #3b82f6;
+            margin-bottom: 10px;
+        }
+        
+        .password-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            color: white;
+            margin: 20px 0;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+        
+        .login-btn:hover {
+            background: #2563eb;
+        }
+        
+        /* MAIN DASHBOARD */
+        .dashboard {
+            display: none;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #1e293b;
+            border-radius: 10px;
+        }
+        
+        .header h1 {
+            color: #3b82f6;
+            font-size: 1.5rem;
+        }
+        
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        /* UPLOAD AREA */
+        .upload-area {
+            border: 3px dashed #3b82f6;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            cursor: pointer;
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .upload-area:hover {
+            background: rgba(59, 130, 246, 0.2);
+        }
+        
+        /* GALLERY */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .image-card {
+            background: #1e293b;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #334155;
+        }
+        
+        .image-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+        
+        .image-info {
+            padding: 10px;
+        }
+        
+        /* BUTTONS */
+        .btn {
+            background: #3b82f6;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .btn-success {
+            background: #10b981;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+        }
+        
+        /* MESSAGES */
+        .message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #10b981;
+            color: white;
+            display: none;
+            z-index: 100;
+        }
+        
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN SCREEN -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-container">
+            <h1 class="login-title">🔐 KHO ẢNH CHUNG</h1>
+            <p>
+            
+            <input type="password" 
+                   id="passwordInput" 
+                   class="password-input" 
+                   placeholder="Nhập mật khẩu"
+                   autofocus>
+            
+            <button class="login-btn" onclick="handleLogin()">
+                🔓 TRUY CẬP
+            </button>
+            
+            <p id="loginMessage" style="color: red; margin-top: 10px; display: none;">
+                Sai mật khẩu  vui lòng nhập lại !
+            </p>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div class="dashboard" id="dashboard">
+        <div class="header">
+            <h1>📸 KHO ẢNH CHUNG </h1>
+            <button class="logout-btn" onclick="handleLogout()">🚪 Đăng xuất</button>
+        </div>
+
+        <!-- UPLOAD SECTION -->
+        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+            <h2>📤 UPLOAD ẢNH</h2>
+            <p>Kéo thả ảnh vào đây hoặc click để chọn</p>
+            <p><small>Hỗ trợ: JPG, PNG, GIF, WebP (tối đa 10MB)</small></p>
+            <input type="file" id="fileInput" multiple accept="image/*" style="display:none" onchange="handleFileSelect(event)">
+        </div>
+
+        <div style="text-align: center; margin: 20px 0;">
+            <button class="btn btn-success" onclick="handleUpload()" id="uploadBtn">
+                📤 UPLOAD ẢNH ĐÃ CHỌN (<span id="selectedCount">0</span>)
+            </button>
+            <button class="btn btn-danger" onclick="clearSelectedFiles()">
+                🗑️ HỦY CHỌN
+            </button>
+        </div>
+
+        <!-- INFO -->
+        <div style="background: #1e293b; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <strong>💡 THÔNG TIN:</strong>
+            <p style="margin-top: 10px; font-size: 0.9rem;">
+                1. Ảnh upload sẽ được <strong>AI CÙNG THẤY</strong><br>
+                2. Tối đa 50 ảnh, mỗi ảnh 10MB<br>
+                3. Ảnh lưu trên trình duyệt của bạn<br>
+                4. Chia sẻ file này cho người khác để cùng xem
+            </p>
+        </div>
+
+        <!-- STATS -->
+        <div style="display: flex; gap: 20px; margin: 20px 0;">
+            <span>📊 <strong id="totalFiles">0</strong> ảnh</span>
+            <span>💾 <strong id="totalSize">0 MB</strong></span>
+        </div>
+
+        <!-- GALLERY -->
+        <h2>🖼️ ẢNH ĐÃ UPLOAD</h2>
+        <div class="gallery" id="imageGallery">
+            <!-- Ảnh sẽ hiển thị ở đây -->
+        </div>
+
+        <div id="emptyState" style="text-align: center; padding: 50px; color: #94a3b8;">
+            <h3>📭 Chưa có ảnh nào</h3>
+            <p>Hãy upload ảnh đầu tiên của bạn!</p>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal" id="viewerModal" onclick="closeModal()">
+        <img id="modalImage">
+    </div>
+
+    <!-- MESSAGE -->
+    <div class="message" id="message"></div>
+
+    <script>
+        // ===== CẤU HÌNH =====
+        const PASSWORD = "3ccd";
+        let filesData = [];
+        let selectedFiles = [];
+
+        // ===== KHỞI ĐỘNG =====
+        window.onload = function() {
+            // Kiểm tra đã login chưa
+            const savedLogin = localStorage.getItem('photoGalleryLogin');
+            if (savedLogin === 'true') {
+                showDashboard();
+                loadData();
+            } else {
+                showLogin();
+            }
+        };
+
+        // ===== ĐĂNG NHẬP =====
+        function handleLogin() {
+            const password = document.getElementById('passwordInput').value.trim();
+            const message = document.getElementById('loginMessage');
+            
+            if (password === PASSWORD) {
+                localStorage.setItem('photoGalleryLogin', 'true');
+                showDashboard();
+                loadData();
+                showMessage('✅ Đăng nhập thành công!', 'success');
+            } else {
+                message.style.display = 'block';
+                message.style.animation = 'none';
+                setTimeout(() => {
+                    message.style.animation = 'shake 0.5s';
+                }, 10);
+            }
+        }
+
+        function handleLogout() {
+            if (confirm('Bạn có chắc muốn đăng xuất?')) {
+                localStorage.removeItem('photoGalleryLogin');
+                showLogin();
+                showMessage('👋 Đã đăng xuất', 'info');
+            }
+        }
+
+        // ===== HIỆN/ẨN MÀN HÌNH =====
+        function showLogin() {
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('dashboard').style.display = 'none';
+        }
+
+        function showDashboard() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+        }
+
+        // ===== XỬ LÝ ẢNH =====
+        function handleFileSelect(event) {
+            const files = Array.from(event.target.files);
+            
+            // Lọc file hợp lệ (dưới 10MB, là ảnh)
+            selectedFiles = files.filter(file => {
+                return file.size <= 10 * 1024 * 1024 && 
+                       file.type.startsWith('image/');
+            });
+            
+            updateSelectedCount();
+            showMessage(`📎 Đã chọn ${selectedFiles.length} ảnh`, 'info');
+        }
+
+        function handleUpload() {
+            if (selectedFiles.length === 0) {
+                showMessage('❌ Vui lòng chọn ảnh trước!', 'error');
+                return;
+            }
+
+            const uploadBtn = document.getElementById('uploadBtn');
+            uploadBtn.innerHTML = '⏳ Đang upload...';
+            uploadBtn.disabled = true;
+
+            let uploaded = 0;
+            selectedFiles.forEach((file, index) => {
+                setTimeout(() => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const fileObj = {
+                            id: Date.now() + index,
+                            name: file.name,
+                            size: formatFileSize(file.size),
+                            date: new Date().toLocaleString('vi-VN'),
+                            data: e.target.result
+                        };
+                        
+                        filesData.unshift(fileObj);
+                        uploaded++;
+                        
+                        if (uploaded === selectedFiles.length) {
+                            saveToStorage();
+                            renderImages();
+                            updateStats();
+                            selectedFiles = [];
+                            updateSelectedCount();
+                            
+                            uploadBtn.innerHTML = '📤 UPLOAD ẢNH ĐÃ CHỌN (0)';
+                            uploadBtn.disabled = false;
+                            
+                            showMessage(`✅ Đã upload ${uploaded} ảnh thành công!`, 'success');
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }, index * 100);
+            });
+        }
+
+        // ===== HIỂN THỊ ẢNH =====
+        function renderImages() {
+            const gallery = document.getElementById('imageGallery');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (filesData.length === 0) {
+                emptyState.style.display = 'block';
+                gallery.innerHTML = '';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            gallery.innerHTML = filesData.map(file => `
+                <div class="image-card">
+                    <img src="${file.data}" alt="${file.name}" onclick="viewImage('${file.id}')">
+                    <div class="image-info">
+                        <p><strong>${file.name}</strong></p>
+                        <p><small>${file.size} • ${file.date}</small></p>
+                        <button class="btn" onclick="viewImage('${file.id}')" style="margin-top: 5px; width: 100%;">
+                            👁️ Xem
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteImage('${file.id}')" style="margin-top: 5px; width: 100%;">
+                            🗑️ Xóa
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function viewImage(id) {
+            const file = filesData.find(f => f.id == id);
+            if (file) {
+                document.getElementById('modalImage').src = file.data;
+                document.getElementById('viewerModal').style.display = 'flex';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('viewerModal').style.display = 'none';
+        }
+
+        function deleteImage(id) {
+            if (confirm('Xóa ảnh này?')) {
+                filesData = filesData.filter(f => f.id != id);
+                saveToStorage();
+                renderImages();
+                updateStats();
+                showMessage('🗑️ Đã xóa ảnh', 'info');
+            }
+        }
+
+        // ===== TIỆN ÍCH =====
+        function updateSelectedCount() {
+            document.getElementById('selectedCount').textContent = selectedFiles.length;
+        }
+
+        function updateStats() {
+            const totalSize = filesData.reduce((sum, file) => {
+                // Ước tính kích thước từ base64
+                return sum + (file.data.length * 0.75);
+            }, 0);
+            
+            document.getElementById('totalFiles').textContent = filesData.length;
+            document.getElementById('totalSize').textContent = formatFileSize(totalSize);
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' Bytes';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+
+        function clearSelectedFiles() {
+            selectedFiles = [];
+            updateSelectedCount();
+            document.getElementById('fileInput').value = '';
+            showMessage('🧹 Đã hủy chọn ảnh', 'info');
+        }
+
+        // ===== LƯU TRỮ =====
+        function loadData() {
+            try {
+                const saved = localStorage.getItem('photoGalleryData');
+                if (saved) {
+                    filesData = JSON.parse(saved);
+                    renderImages();
+                    updateStats();
+                }
+            } catch (e) {
+                console.error('Lỗi load data:', e);
+            }
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('photoGalleryData', JSON.stringify(filesData));
+        }
+
+        // ===== THÔNG BÁO =====
+        function showMessage(text, type) {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.style.background = type === 'success' ? '#10b981' : 
+                                      type === 'error' ? '#ef4444' : '#3b82f6';
+            message.style.display = 'block';
+            
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 3000);
+        }
+
+        // ===== DRAG & DROP =====
+        document.addEventListener('dragover', function(e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener('drop', function(e) {
+            e.preventDefault();
+            const uploadArea = document.querySelector('.upload-area');
+            uploadArea.style.background = '';
+        });
+
+        const uploadArea = document.querySelector('.upload-area');
+        uploadArea.addEventListener('dragover', function() {
+            this.style.background = 'rgba(59, 130, 246, 0.3)';
+        });
+
+        uploadArea.addEventListener('dragleave', function() {
+            this.style.background = '';
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.style.background = '';
+            
+            const files = Array.from(e.dataTransfer.files);
+            if (files.length > 0) {
+                const fakeEvent = {
+                    target: { files: e.dataTransfer.files }
+                };
+                handleFileSelect(fakeEvent);
+            }
+        });
+    </script>
+</body>
+</html>
